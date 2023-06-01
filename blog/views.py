@@ -46,9 +46,16 @@ def index(request):
 
     posts = Post.objects\
         .prefetch_related('author')\
-        .annotate(num_likes=Count('likes', distinct=True), num_comments=Count('comments', distinct=True))\
+        .annotate(num_likes=Count('likes', distinct=True))\
         .order_by('num_likes')
     most_popular_posts = list(posts)[-5:]
+    most_popular_posts_ids = [post.pk for post in most_popular_posts]
+    posts_with_comments = Post.objects.filter(pk__in=most_popular_posts_ids)\
+        .annotate(num_comments=Count('comments'))
+    ids_and_comments = posts_with_comments.values_list('id', 'num_comments')
+    ids_and_comments = dict(ids_and_comments)
+    for post in most_popular_posts:
+        post.num_comments = ids_and_comments[post.pk]
 
     fresh_posts = Post.objects\
         .prefetch_related('author')\
