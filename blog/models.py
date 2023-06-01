@@ -25,16 +25,19 @@ class Post(models.Model):
         related_name='posts',
         verbose_name='Теги')
 
+    class Meta:
+        ordering = ['-published_at']
+        verbose_name = 'пост'
+        verbose_name_plural = 'посты'
+
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('post_detail', args={'slug': self.slug})
 
-    class Meta:
-        ordering = ['-published_at']
-        verbose_name = 'пост'
-        verbose_name_plural = 'посты'
+    def get_likes_count(self):
+        return self.likes.count()
 
 
 class Tag(models.Model):
