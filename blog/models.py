@@ -36,9 +36,6 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post_detail', args={'slug': self.slug})
 
-    def get_likes_count(self):
-        return self.likes.count()
-
 
 class Tag(models.Model):
     title = models.CharField('Тег', max_length=20, unique=True)
