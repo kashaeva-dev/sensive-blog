@@ -25,7 +25,6 @@ class PostQuerySet(models.QuerySet):
         :return: A list of posts with the 'num_comments' attribute set
         """
 
-
         most_popular_posts = list(self)
         most_popular_posts_ids = [post.pk for post in most_popular_posts]
         posts_with_comments = Post.objects.filter(pk__in=most_popular_posts_ids) \
