@@ -10,6 +10,32 @@ class PostQuerySet(models.QuerySet):
         posts_at_year = self.filter(published_at__year=year).order_by('published_at')
         return posts_at_year
 
+    def popular(self):
+        sorted_by_likes_count = self.annotate(num_likes=Count('likes', distinct=True)).order_by('-num_likes')
+        return sorted_by_likes_count
+
+    def fetch_with_comments_count(self):
+        """
+        Annotates each post in the queryset with the count of comments it has.
+        It fetches the comments count for each post through a separate query
+        and assigns the count to the 'num_comments' attribute of each post.
+        This approach is more efficient than using the annotate() method when another
+        annotation is already present in the queryset
+        (e.g. when we need to sort the posts by likes).
+        :return: A list of posts with the 'num_comments' attribute set
+        """
+
+
+        most_popular_posts = list(self)
+        most_popular_posts_ids = [post.pk for post in most_popular_posts]
+        posts_with_comments = Post.objects.filter(pk__in=most_popular_posts_ids) \
+            .annotate(num_comments=Count('comments'))
+        ids_and_comments = posts_with_comments.values_list('id', 'num_comments')
+        ids_and_comments = dict(ids_and_comments)
+        for post in most_popular_posts:
+            post.num_comments = ids_and_comments[post.pk]
+        return most_popular_posts
+
 
 class TagQuerySet(models.QuerySet):
 
