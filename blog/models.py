@@ -1,14 +1,10 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Count, Prefetch
 from django.urls import reverse
-from django.contrib.auth.models import User
 
 
 class PostQuerySet(models.QuerySet):
-
-    def year(self, year):
-        posts_at_year = self.filter(published_at__year=year).order_by('published_at')
-        return posts_at_year
 
     def popular(self):
         sorted_by_likes_count = self.annotate(num_likes=Count('likes', distinct=True)).order_by('-num_likes')
