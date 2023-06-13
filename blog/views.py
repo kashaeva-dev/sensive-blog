@@ -4,10 +4,6 @@ from django.shortcuts import render, get_object_or_404
 from blog.models import Comment, Post, Tag
 
 
-def get_related_posts_count(tag):
-    return tag.posts.count()
-
-
 def serialize_post(post):
     return {
         'title': post.title,
@@ -54,7 +50,9 @@ def index(request):
 
 def post_detail(request, slug):
     posts = Post.objects\
-        .select_related('author').prefetch_tags_with_num_posts()
+        .select_related('author')\
+        .prefetch_tags_with_num_posts()\
+        .prefetch_num_likes()
     post = get_object_or_404(posts, slug=slug)
     comments = post.comments.select_related('author').all()
     serialized_comments = []
@@ -65,7 +63,7 @@ def post_detail(request, slug):
             'author': comment.author.username,
         })
 
-    likes = post.likes.count()
+    likes = post.num_likes
 
     related_tags = post.tags.all()
 

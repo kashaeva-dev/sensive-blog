@@ -39,6 +39,9 @@ class PostQuerySet(models.QuerySet):
             )
         )
 
+    def prefetch_num_likes(self):
+        return self.annotate(num_likes=Count('likes', distinct=True))
+
 
 class TagQuerySet(models.QuerySet):
 
