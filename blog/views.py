@@ -56,7 +56,7 @@ def post_detail(request, slug):
     posts = Post.objects\
         .select_related('author').prefetch_tags_with_num_posts()
     post = get_object_or_404(posts, slug=slug)
-    comments = Comment.objects.select_related('author').filter(post=post)
+    comments = post.comments.select_related('author').all()
     serialized_comments = []
     for comment in comments:
         serialized_comments.append({
